@@ -2,9 +2,9 @@ import streamlit as st
 import random
 import requests
 import pandas as pd
-import threading  # ← 【追加】裏側で処理を走らせるためのモジュール
+import threading
 
-# 発行したGASのURL（連携済み）
+# 発行したGASのURL
 GAS_URL = "https://script.google.com/macros/s/AKfycbyCSJ8P3-0HoBHWL-KzdF8DnV21ArXCeNa8j93Apx5lokKu6RpHDKYl0aetvgdOVAQ-1g/exec"
 
 # --- 症例生成ロジック ---
@@ -12,7 +12,6 @@ def generate_case():
     disorders = ["代謝性アシドーシス", "代謝性アルカローシス", "呼吸性アシドーシス", "呼吸性アルカローシス"]
     primary = random.choice(disorders)
 
-    # 臨床的にあり得る数値をWinterの式などをベースに生成（急性代償を想定）
     if primary == "代謝性アシドーシス":
         hco3 = random.randint(10, 20)
         paco2 = int(1.5 * hco3 + 8 + random.randint(-2, 2))
@@ -32,54 +31,57 @@ def generate_case():
 
     return {"pH": round(ph, 2), "PaCO2": paco2, "HCO3": hco3, "answer": primary}
 
-# --- 通信用の関数 ---
+# --- 通信用の関数（爆速化） ---
 def save_score(name, score, rank):
-    # 裏側で実行する専用の処理
     def _send_data():
         try:
             data = {"name": name, "score": score, "rank": rank}
             requests.post(GAS_URL, json=data)
-            load_ranking.clear() # 送信が完了したらキャッシュを消す
+            load_ranking.clear() # 送信完了後にキャッシュをリセット
         except:
             pass
-
-    # Streamlitの画面更新を待たせずに、裏側で送信処理をスタート！
+    # 画面を止めずに裏側で通信をスタート
     thread = threading.Thread(target=_send_data)
     thread.start()
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60) # 60秒間はデータを使い回して爆速表示
 def load_ranking():
-    response = requests.get(GAS_URL)
-    return response.json()
+    try:
+        response = requests.get(GAS_URL)
+        return response.json()
+    except:
+        return []
+
 # --- Streamlit UI ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
 # セッションステート初期化
 if 'score' not in st.session_state: st.session_state.score = 0
+if 'question_count' not in st.session_state: st.session_state.question_count = 1
 if 'current_case' not in st.session_state: st.session_state.current_case = generate_case()
 if 'feedback' not in st.session_state: st.session_state.feedback = ""
+if 'is_game_over' not in st.session_state: st.session_state.is_game_over = False
+if 'last_score' not in st.session_state: st.session_state.last_score = 0
+if 'last_rank' not in st.session_state: st.session_state.last_rank = ""
 if 'player_name' not in st.session_state: st.session_state.player_name = "名無し"
 
 st.title("電解質・酸塩基平衡 タイムアタック ⚔️")
 
-# サイドバーにランキングを表示
+# --- サイドバー（ランキング） ---
 st.sidebar.header("🏆 歴代トップランカー")
 try:
     ranking_data = load_ranking()
     if ranking_data:
         df = pd.DataFrame(ranking_data)
-        df.index = df.index + 1 # 順位を1からスタート
+        df.index = df.index + 1 
         st.sidebar.dataframe(df[['name', 'score', 'rank']])
 except:
     st.sidebar.write("ランキング読み込み中...")
 
-# --- プレイヤー名入力 ---
 st.session_state.player_name = st.text_input("あなたの名前（武将名）を入力して出陣！", st.session_state.player_name)
-
 st.markdown("---")
 
-# 階級判定
-# --- 階級判定 ---
+# --- 階級判定（全40段階） ---
 rank_names = [
     "農民", "迷子の足軽", "いけてる足軽", "槍の又左のパシリ", "落ち武者狩り（逃げる側）", "運のいい足軽頭",
     "影武者の影武者", "疾風の忍び", "闇夜の暗殺者", "独眼竜の右目", "第六天魔王の小姓", "傾奇者",
@@ -89,13 +91,50 @@ rank_names = [
     "征夷大将軍", "東照大権現", "漆黒の堕天使", "封印されし魔眼の持ち主", "輪廻転生せし修羅", "時空を統べる太閤",
     "森羅万象の理", "神の領域（酸塩基の絶対神）", "概念（もはや人ではない）", "創造主"
 ]
-
-# スコアを2で割った商（切り捨て）をインデックスにする
-# ただし、リストの最大数を超えないように調整
+# スコアを2で割って階級を上げる
 rank_index = min(st.session_state.score // 2, len(rank_names) - 1)
 current_rank = rank_names[rank_index]
 
-# 問題表示
+# --- 派手なゲームオーバー画面 ---
+if st.session_state.is_game_over:
+    st.error("💀 **無念、討死...！！** 正解は「" + st.session_state.current_case['answer'] + "」でした。")
+    
+    # HTMLを使ってド派手な戦績カードを作成
+    st.markdown(f"""
+    <div style='text-align: center; border: 3px solid #ff4b4b; padding: 20px; border-radius: 10px; background-color: #330000; color: white;'>
+        <h2 style='color: #ff4b4b;'>⚔️ 戦績報告 ⚔️</h2>
+        <p style='font-size: 20px;'><b>{st.session_state.player_name}</b> 殿</p>
+        <h1>最終スコア： {st.session_state.last_score}</h1>
+        <h2 style='color: gold;'>最終階級：【 {st.session_state.last_rank} 】</h2>
+        <p>ランキングに記録されました！次の出陣をお待ちしております。</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 10点以上（六文銭の旗持ち以上）なら風船でお祝い
+    if st.session_state.last_score >= 10:
+        st.balloons()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🔄 新たな戦（ゲーム）を始める", use_container_width=True, type="primary"):
+        st.session_state.is_game_over = False
+        st.session_state.current_case = generate_case()
+        st.rerun()
+    
+    st.stop() # ここで止めて下の問題を表示させない
+
+# --- ステータス表示 ---
+col1, col2, col3 = st.columns(3)
+col1.metric("現在の試練", f"第 {st.session_state.question_count} 問")
+col2.metric("現在のスコア", st.session_state.score)
+col3.metric("現在の階級", current_rank)
+
+# 階級アップのプログレスバー
+st.progress((st.session_state.score % 2) / 2, text=f"次の階級まで... {'あと1問！' if (st.session_state.score % 2) != 0 else '出陣中'}")
+
+if st.session_state.feedback:
+    st.success(st.session_state.feedback)
+
+# --- 問題表示 ---
 case = st.session_state.current_case
 st.info(f"**【患者データ】**\n\n**pH**: {case['pH']}　|　**PaCO2**: {case['PaCO2']} mmHg　|　**HCO3-**: {case['HCO3']} mEq/L")
 st.write("最も疑われる一次性の酸塩基平衡異常はどれですか？")
@@ -108,15 +147,20 @@ for i, option in enumerate(options):
         if option == case["answer"]:
             st.session_state.feedback = f"✅ 見事！正解です（{option}）。"
             st.session_state.score += 1
+            st.session_state.question_count += 1
+            st.session_state.current_case = generate_case()
         else:
-            st.session_state.feedback = f"❌ 無念…！正解は「{case['answer']}」でした。"
+            # 討死処理
+            st.session_state.feedback = "" 
+            st.session_state.last_score = st.session_state.score
+            st.session_state.last_rank = current_rank
             
-            # --- 📌 ここでスコアを保存！ ---
             if st.session_state.score > 0:
                 save_score(st.session_state.player_name, st.session_state.score, current_rank)
-                st.session_state.feedback += f"\n\n（スコア {st.session_state.score} で記録されました）"
             
-            st.session_state.score = 0 # リセット
-        
-        st.session_state.current_case = generate_case()
+            # リセット
+            st.session_state.score = 0
+            st.session_state.question_count = 1
+            st.session_state.is_game_over = True
+            
         st.rerun()
