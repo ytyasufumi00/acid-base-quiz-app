@@ -35,7 +35,9 @@ def generate_case():
 def save_score(name, score, rank):
     data = {"name": name, "score": score, "rank": rank}
     requests.post(GAS_URL, json=data)
+    load_ranking.clear() # ←【追加①】スコアを保存した直後に、記憶(キャッシュ)をリセットする
 
+@st.cache_data(ttl=60) # ←【追加②】ここが魔法の1行！(60秒間は前回読み込んだランキングを使い回す)
 def load_ranking():
     response = requests.get(GAS_URL)
     return response.json()
