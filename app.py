@@ -79,17 +79,21 @@ st.session_state.player_name = st.text_input("あなたの名前（武将名）�
 st.markdown("---")
 
 # 階級判定
-ranks = [(0, "足軽"), (3, "侍大将"), (7, "家老"), (10, "真田家臣"), (15, "上田城主（指導医級）")]
-current_rank = "足軽"
-for threshold, rank in ranks:
-    if st.session_state.score >= threshold:
-        current_rank = rank
+# --- 階級判定 ---
+rank_names = [
+    "農民", "迷子の足軽", "いけてる足軽", "槍の又左のパシリ", "落ち武者狩り（逃げる側）", "運のいい足軽頭",
+    "影武者の影武者", "疾風の忍び", "闇夜の暗殺者", "独眼竜の右目", "第六天魔王の小姓", "傾奇者",
+    "六文銭の旗持ち", "信濃の荒武者", "川中島からの生還者", "赤備えの先鋒", "表裏比興の弟子", "上田城の門番",
+    "真田十勇士（補欠）", "真田十勇士", "真田信之級（鉄壁の守り）", "鬼神の如き猛将", "越後の龍の鱗", "甲斐の虎の牙",
+    "剣聖", "東国無双", "天下布武の右腕", "日ノ本一の兵（真田幸村級）", "覇王の軍師", "関白",
+    "征夷大将軍", "東照大権現", "漆黒の堕天使", "封印されし魔眼の持ち主", "輪廻転生せし修羅", "時空を統べる太閤",
+    "森羅万象の理", "神の領域（酸塩基の絶対神）", "概念（もはや人ではない）", "創造主"
+]
 
-col1, col2 = st.columns(2)
-col1.metric("現在のスコア", st.session_state.score)
-col2.metric("現在の階級", current_rank)
-
-st.write(st.session_state.feedback)
+# スコアを2で割った商（切り捨て）をインデックスにする
+# ただし、リストの最大数を超えないように調整
+rank_index = min(st.session_state.score // 2, len(rank_names) - 1)
+current_rank = rank_names[rank_index]
 
 # 問題表示
 case = st.session_state.current_case
