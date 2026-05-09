@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import requests
 import pandas as pd
+import threading  # ← 【追加】裏側で処理を走らせるためのモジュール
 
 # 発行したGASのURL（連携済み）
 GAS_URL = "https://script.google.com/macros/s/AKfycbyCSJ8P3-0HoBHWL-KzdF8DnV21ArXCeNa8j93Apx5lokKu6RpHDKYl0aetvgdOVAQ-1g/exec"
@@ -33,15 +34,23 @@ def generate_case():
 
 # --- 通信用の関数 ---
 def save_score(name, score, rank):
-    data = {"name": name, "score": score, "rank": rank}
-    requests.post(GAS_URL, json=data)
-    load_ranking.clear() # ←【追加①】スコアを保存した直後に、記憶(キャッシュ)をリセットする
+    # 裏側で実行する専用の処理
+    def _send_data():
+        try:
+            data = {"name": name, "score": score, "rank": rank}
+            requests.post(GAS_URL, json=data)
+            load_ranking.clear() # 送信が完了したらキャッシュを消す
+        except:
+            pass
 
-@st.cache_data(ttl=60) # ←【追加②】ここが魔法の1行！(60秒間は前回読み込んだランキングを使い回す)
+    # Streamlitの画面更新を待たせずに、裏側で送信処理をスタート！
+    thread = threading.Thread(target=_send_data)
+    thread.start()
+
+@st.cache_data(ttl=60)
 def load_ranking():
     response = requests.get(GAS_URL)
     return response.json()
-
 # --- Streamlit UI ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
