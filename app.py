@@ -51,6 +51,37 @@ def load_ranking():
         return response.json()
     except:
         return []
+@st.cache_data(ttl=60)
+def load_ranking():
+    try:
+        response = requests.get(GAS_URL)
+        return response.json()
+    except:
+        return []
+
+# --- ここ（54行目付近）に追加 ---
+def handle_answer(user_selection, current_rank):
+    case = st.session_state.current_case
+    if user_selection == case["answer"]:
+        st.session_state.feedback = f"✅ 見事！正解です（{user_selection}）。"
+        st.session_state.score += 1
+        st.session_state.question_count += 1
+        st.session_state.current_case = generate_case()
+    else:
+        # 討死処理
+        st.session_state.feedback = "" 
+        st.session_state.last_score = st.session_state.score
+        st.session_state.last_rank = current_rank
+        
+        if st.session_state.score > 0:
+            save_score(st.session_state.player_name, st.session_state.score, current_rank)
+        
+        # リセット
+        st.session_state.score = 0
+        st.session_state.question_count = 1
+        st.session_state.is_game_over = True
+    
+    st.rerun()
 
 # --- Streamlit UI ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
@@ -173,28 +204,43 @@ case = st.session_state.current_case
 st.info(f"**【患者データ】**\n\n**pH**: {case['pH']}　|　**PaCO2**: {case['PaCO2']} mmHg　|　**HCO3-**: {case['HCO3']} mEq/L")
 st.write("最も疑われる一次性の酸塩基平衡異常はどれですか？")
 
-options = ["代謝性アシドーシス", "代謝性アルカローシス", "呼吸性アシドーシス", "呼吸性アルカローシス"]
-cols = st.columns(2)
+# --- ステータス表示（1行に集約） ---
+st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #262730; border-radius: 10px; margin-bottom: 20px; color: white;">
+        <div style="text-align: center; flex: 1;">
+            <div style="font-size: 0.7rem; color: #888;">試練</div>
+            <div style="font-size: 1.1rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
+        </div>
+        <div style="text-align: center; flex: 1; border-left: 1px solid #444; border-right: 1px solid #444;">
+            <div style="font-size: 0.7rem; color: #888;">レベル</div>
+            <div style="font-size: 1.1rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
+        </div>
+        <div style="text-align: center; flex: 2;">
+            <div style="font-size: 1.8rem;">{character}</div>
+            <div style="font-size: 0.9rem; font-weight: bold;">{current_rank}</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-for i, option in enumerate(options):
-    if cols[i % 2].button(option, use_container_width=True):
-        if option == case["answer"]:
-            st.session_state.feedback = f"✅ 見事！正解です（{option}）。"
-            st.session_state.score += 1
-            st.session_state.question_count += 1
-            st.session_state.current_case = generate_case()
-        else:
-            # 討死処理
-            st.session_state.feedback = "" 
-            st.session_state.last_score = st.session_state.score
-            st.session_state.last_rank = current_rank
-            
-            if st.session_state.score > 0:
-                save_score(st.session_state.player_name, st.session_state.score, current_rank)
-            
-            # リセット
-            st.session_state.score = 0
-            st.session_state.question_count = 1
-            st.session_state.is_game_over = True
-            
-        st.rerun()
+st.progress((st.session_state.score % 2) / 2)
+
+# 患者データ表示
+case = st.session_state.current_case
+st.info(f"**pH**: {case['pH']} | **PaCO2**: {case['PaCO2']} | **HCO3-**: {case['HCO3']}")
+
+# --- 視覚的な回答ボタン ---
+col_a, col_b = st.columns(2)
+
+with col_a:
+    st.write("🟦 **アシドーシス系**")
+    if st.button("💦 代謝性アシドーシス", use_container_width=True):
+        handle_answer("代謝性アシドーシス", current_rank)
+    if st.button("🌬️ 呼吸性アシドーシス", use_container_width=True):
+        handle_answer("呼吸性アシドーシス", current_rank)
+
+with col_b:
+    st.write("🟥 **アルカローシス系**")
+    if st.button("🔥 代謝性アルカローシス", use_container_width=True):
+        handle_answer("代謝性アルカローシス", current_rank)
+    if st.button("☁️ 呼吸性アルカローシス", use_container_width=True):
+        handle_answer("呼吸性アルカローシス", current_rank)
