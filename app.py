@@ -3,6 +3,7 @@ import random
 import requests
 import pandas as pd
 import threading
+import time  
 
 # 発行したGASのURL
 GAS_URL = "https://script.google.com/macros/s/AKfycbyItu-Z6pmfnN-UUFME3I_YFv7rfujWFhI2oEsqFAW5CTu6AU7iZZuLEM7bBDRay5jU/exec"
@@ -212,6 +213,13 @@ st.markdown(f"""
 
 
 # --- 進行状況バー（レベルアップ条件に完全同期） ---
+# 1. 前回のレベルを記憶しておくための準備
+if 'last_rendered_lv' not in st.session_state:
+    st.session_state.last_rendered_lv = current_lv
+
+# 2. レベルアップしたかどうかの判定（今のレベルが前回より高ければON）
+just_leveled_up = current_lv > st.session_state.last_rendered_lv
+st.session_state.last_rendered_lv = current_lv  # 次回のために記憶を更新
 score = st.session_state.score
 if score < 40:
     # Lv20までは2問でレベルアップ (50%ずつ)
@@ -229,16 +237,22 @@ else:
     # 創造主（Lv100）到達時は常にMAX
     progress_val = 1.0
 
-# 💡 バーの上のテキストを、状況に合わせて変化させる
+# 4. バーを描画するための「専用の枠」を作る
+bar_placeholder = st.empty()
+
+# 5. 【ここが魔法！】レベルアップした瞬間だけ、一瞬100%を表示して時間を止める
+if just_leveled_up:
+    bar_placeholder.progress(1.0, text="✨ 見事！階級昇格！！ ✨")
+    time.sleep(0.2)  # 0.2秒間だけプレイヤーに100%のドヤ顔バーを見せつける
+
+# 6. その後、通常のバー（0%や現在の状態）で上書きしてゲームを再開
 if progress_val == 1.0:
     bar_text = "🌌 創造主到達！あなたは神です 🌌"
-elif progress_val == 0.0 and score > 0:
-    bar_text = "✨ 階級昇格！新たなる試練へ ✨"
 else:
-    bar_text = f"次の階級まで... 出陣中！"
+    bar_text = f"次の階級まで... {'新たなる試練へ' if progress_val == 0.0 else '出陣中！'}"
 
-# バーとテキストを表示（以前の st.progress は消してこちらに差し替え）
-st.progress(progress_val, text=bar_text)
+bar_placeholder.progress(progress_val, text=bar_text)
+# ==========================================
 
 
 # --- 問題（患者データ）表示 ---
