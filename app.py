@@ -133,17 +133,6 @@ col2.metric("現在のスコア", st.session_state.score)
 col3.metric("現在の階級", f"{character} Lv.{current_lv}")
 
 
-
-# 階級名の決定（リストにないレベルは「熟練の〇〇」や「伝説の〇〇」として表示）
-if current_lv < len(rank_names):
-    current_rank = rank_names[current_lv]
-elif current_lv < 90:
-    current_rank = f"歴戦の英雄 (Lv.{current_lv})"
-elif current_lv < 100:
-    current_rank = f"神に近い存在 (Lv.{current_lv})"
-else:
-    current_rank = "創造主 (Lv.100)"
-
 # --- 派手なゲームオーバー画面 ---
 if st.session_state.is_game_over:
     st.error("💀 **無念、討死...！！** 正解は「" + st.session_state.current_case['answer'] + "」でした。")
