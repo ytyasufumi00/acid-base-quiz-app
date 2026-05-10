@@ -132,6 +132,8 @@ col2.metric("現在のスコア", st.session_state.score)
 # 階級の横にキャラクターを表示！
 col3.metric("現在の階級", f"{character} Lv.{current_lv}")
 
+st.subheader(f"称号：{current_rank}")
+
 
 # --- 派手なゲームオーバー画面 ---
 if st.session_state.is_game_over:
