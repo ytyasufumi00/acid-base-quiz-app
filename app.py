@@ -55,6 +55,21 @@ def load_ranking():
 # --- Streamlit UI ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
+# ブラウザの自動翻訳を無効化する設定
+st.markdown(
+    """
+    <style>
+        /* ページ全体を翻訳対象外に設定 */
+    </style>
+    <script>
+        // HTMLのlang属性を固定し、翻訳のトリガーを抑制
+        document.documentElement.lang = 'ja';
+    </script>
+    <meta name="google" content="notranslate">
+    """,
+    unsafe_allow_html=True
+)
+
 # セッションステート初期化
 if 'score' not in st.session_state: st.session_state.score = 0
 if 'question_count' not in st.session_state: st.session_state.question_count = 1
