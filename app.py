@@ -199,16 +199,16 @@ if st.session_state.is_game_over:
 # --- 進行状況バー（レベルアップ条件に完全同期） ---
 score = st.session_state.score
 if score < 40:
-    # Lv20までは2問でレベルアップ
+    # Lv20までは2問でレベルアップ (50%ずつ)
     progress_val = (score % 2) / 2.0
 elif score < 130:
-    # Lv21〜50は3問でレベルアップ
+    # Lv21〜50は3問でレベルアップ (33%ずつ)
     progress_val = ((score - 40) % 3) / 3.0
 elif score < 290:
-    # Lv51〜90は4問でレベルアップ
+    # Lv51〜90は4問でレベルアップ (25%ずつ)
     progress_val = ((score - 130) % 4) / 4.0
 elif score < 340:
-    # Lv91〜100は5問でレベルアップ
+    # Lv91〜100は5問でレベルアップ (20%ずつ)
     progress_val = ((score - 290) % 5) / 5.0
 else:
     # 創造主（Lv100）到達時は常にMAX
