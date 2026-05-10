@@ -164,7 +164,6 @@ col3.metric("現在の階級", f"{character} Lv.{current_lv}")
 
 st.subheader(f"称号：{current_rank}")
 
-
 # --- 派手なゲームオーバー画面 ---
 if st.session_state.is_game_over:
     st.error("💀 **無念、討死...！！** 正解は「" + st.session_state.current_case['answer'] + "」でした。")
@@ -192,8 +191,24 @@ if st.session_state.is_game_over:
     
     st.stop() # ここで止めて下の問題を表示させない
 
-# --- 階級判定とキャラクター決定 ---
-# (前回のロジックで current_lv, current_rank, character が決まっている前提)
+
+# --- ステータス表示（1行に集約） ---
+st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #262730; border-radius: 10px; margin-bottom: 20px; color: white;">
+        <div style="text-align: center; flex: 1;">
+            <div style="font-size: 0.7rem; color: #888;">試練</div>
+            <div style="font-size: 1.1rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
+        </div>
+        <div style="text-align: center; flex: 1; border-left: 1px solid #444; border-right: 1px solid #444;">
+            <div style="font-size: 0.7rem; color: #888;">レベル</div>
+            <div style="font-size: 1.1rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
+        </div>
+        <div style="text-align: center; flex: 2;">
+            <div style="font-size: 1.8rem;">{character}</div>
+            <div style="font-size: 0.9rem; font-weight: bold;">{current_rank}</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
 
 # --- 進行状況バー（レベルアップ条件に完全同期） ---
@@ -215,34 +230,12 @@ else:
     progress_val = 1.0
 
 st.progress(progress_val)
-# --- 問題表示 ---
-case = st.session_state.current_case
-st.info(f"**【患者データ】**\n\n**pH**: {case['pH']}　|　**PaCO2**: {case['PaCO2']} mmHg　|　**HCO3-**: {case['HCO3']} mEq/L")
-st.write("最も疑われる一次性の酸塩基平衡異常はどれですか？")
 
-# --- ステータス表示（1行に集約） ---
-st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #262730; border-radius: 10px; margin-bottom: 20px; color: white;">
-        <div style="text-align: center; flex: 1;">
-            <div style="font-size: 0.7rem; color: #888;">試練</div>
-            <div style="font-size: 1.1rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
-        </div>
-        <div style="text-align: center; flex: 1; border-left: 1px solid #444; border-right: 1px solid #444;">
-            <div style="font-size: 0.7rem; color: #888;">レベル</div>
-            <div style="font-size: 1.1rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
-        </div>
-        <div style="text-align: center; flex: 2;">
-            <div style="font-size: 1.8rem;">{character}</div>
-            <div style="font-size: 0.9rem; font-weight: bold;">{current_rank}</div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
 
-st.progress((st.session_state.score % 2) / 2)
-
-# 患者データ表示
+# --- 問題（患者データ）表示 ---
 case = st.session_state.current_case
 st.info(f"**pH**: {case['pH']} | **PaCO2**: {case['PaCO2']} | **HCO3-**: {case['HCO3']}")
+
 
 # --- 視覚的な回答ボタン ---
 col_a, col_b = st.columns(2)
