@@ -5,7 +5,7 @@ import pandas as pd
 import threading
 
 # 発行したGASのURL
-GAS_URL = "https://script.google.com/macros/s/AKfycbyCSJ8P3-0HoBHWL-KzdF8DnV21ArXCeNa8j93Apx5lokKu6RpHDKYl0aetvgdOVAQ-1g/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbyItu-Z6pmfnN-UUFME3I_YFv7rfujWFhI2oEsqFAW5CTu6AU7iZZuLEM7bBDRay5jU/exec"
 
 # --- 症例生成ロジック ---
 def generate_case():
