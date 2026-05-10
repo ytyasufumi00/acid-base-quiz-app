@@ -146,32 +146,12 @@ def calculate_level(score):
     else: level = 35 + (score - 90) // 5
     return min(level, 100)
 
-current_lv = calculate_level(st.session_state.score)
-
-# 階級名と絵文字の決定
-if current_lv < len(rank_data):
-    current_rank, character = rank_data[current_lv]
-elif current_lv < 100:
-    current_rank, character = f"☆創造主☆", "👑"
-else:
-    current_rank, character = "創造主", "🌌"
-
-# --- UI表示部分 ---
-col1, col2, col3 = st.columns(3)
-col1.metric("現在の試練", f"第 {st.session_state.question_count} 問")
-col2.metric("現在のスコア", st.session_state.score)
-# 階級の横にキャラクターを表示！
-col3.metric("現在の階級", f"{character} Lv.{current_lv}")
-
-st.subheader(f"称号：{current_rank}")
-
-# --- 派手なゲームオーバー画面（振り返り機能付き） ---
 if st.session_state.is_game_over:
-    failed_case = st.session_state.current_case # 討死した時のデータを保持
+    failed_case = st.session_state.current_case
     
     st.error("💀 **無念、討死...！！**")
     
-    # 【追加】問題の振り返りエリア
+    # 振り返りパネル
     st.markdown(f"""
         <div style="background-color: #4d0000; padding: 15px; border-radius: 10px; border: 1px solid #ff4b4b; margin-bottom: 20px; color: white;">
             <p style="margin: 0; color: #ffbcbc; font-size: 0.8rem;">【討死した問題のデータ】</p>
@@ -185,7 +165,7 @@ if st.session_state.is_game_over:
         </div>
     """, unsafe_allow_html=True)
     
-    # HTMLを使ってド派手な戦績カードを作成
+    # 戦績報告カード
     st.markdown(f"""
     <div style='text-align: center; border: 3px solid #ff4b4b; padding: 20px; border-radius: 10px; background-color: #330000; color: white;'>
         <h2 style='color: #ff4b4b;'>⚔️ 戦績報告 ⚔️</h2>
@@ -205,10 +185,23 @@ if st.session_state.is_game_over:
         st.session_state.current_case = generate_case()
         st.rerun()
     
-    st.stop()
+    st.stop() # 👈 ここで処理が止まるため、下の「農民」は絶対に表示されません！
 
 
-# --- ステータス表示（1行に集約） ---
+# ==========================================
+# ⚔️ 以下、ゲーム継続中のみ表示される画面
+# ==========================================
+
+current_lv = calculate_level(st.session_state.score)
+
+if current_lv < len(rank_data):
+    current_rank, character = rank_data[current_lv]
+elif current_lv < 100:
+    current_rank, character = f"☆創造主☆", "👑"
+else:
+    current_rank, character = "創造主", "🌌"
+
+# --- 1. ステータス表示（1行に集約） ---
 st.markdown(f"""
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #262730; border-radius: 10px; margin-bottom: 20px; color: white;">
         <div style="text-align: center; flex: 1;">
@@ -226,15 +219,13 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-
-# --- 進行状況バー（レベルアップ条件に完全同期） ---
-# 1. 前回のレベルを記憶しておくための準備
+# --- 2. 進行状況バー（100%一瞬表示アニメーション付き） ---
 if 'last_rendered_lv' not in st.session_state:
     st.session_state.last_rendered_lv = current_lv
 
-# 2. レベルアップしたかどうかの判定（今のレベルが前回より高ければON）
 just_leveled_up = current_lv > st.session_state.last_rendered_lv
-st.session_state.last_rendered_lv = current_lv  # 次回のために記憶を更新
+st.session_state.last_rendered_lv = current_lv 
+
 score = st.session_state.score
 if score < 40:
     # Lv20までは2問でレベルアップ (50%ずつ)
@@ -252,35 +243,23 @@ else:
     # 創造主（Lv100）到達時は常にMAX
     progress_val = 1.0
 
-# 4. バーを描画するための「専用の枠」を作る
 bar_placeholder = st.empty()
 
-# 5. 【ここが魔法！】レベルアップした瞬間だけ、一瞬100%を表示して時間を止める
 if just_leveled_up:
     bar_placeholder.progress(1.0, text="✨ 見事！階級昇格！！ ✨")
-    time.sleep(0.8)  # 0.8秒間だけプレイヤーに100%のドヤ顔バーを見せつける
+    time.sleep(0.8) 
 
-# 6. その後、通常のバー（0%や現在の状態）で上書きしてゲームを再開
-if progress_val == 1.0:
-    bar_text = "🌌 創造主到達！あなたは神です 🌌"
-else:
-    bar_text = f"次の階級まで... {'新たなる試練へ' if progress_val == 0.0 else '出陣中！'}"
+if progress_val == 1.0: bar_text = "🌌 創造主到達！あなたは神です 🌌"
+else: bar_text = f"次の階級まで... {'新たなる試練へ' if progress_val == 0.0 else '出陣中！'}"
 
 bar_placeholder.progress(progress_val, text=bar_text)
-# ==========================================
 
-
-# --- 問題（患者データ）表示 ---
+# --- 3. 問題（患者データ）表示 ---
 case = st.session_state.current_case
-
-# 1. 単位を追加
 st.info(f"**pH**: {case['pH']} | **PaCO2**: {case['PaCO2']} mmHg | **HCO3-**: {case['HCO3']} mEq/L")
-
-# 2. 問題文を追加
 st.write("最も疑われる一次性の酸塩基平衡異常はどれですか？")
 
-
-# --- 視覚的な回答ボタン ---
+# --- 4. 視覚的な回答ボタン ---
 col_a, col_b = st.columns(2)
 
 with col_a:
