@@ -196,8 +196,25 @@ if st.session_state.is_game_over:
 # (前回のロジックで current_lv, current_rank, character が決まっている前提)
 
 
-# 進行状況バー（細くしてシンプルに）
-st.progress((st.session_state.score % 2) / 2)
+# --- 進行状況バー（レベルアップ条件に完全同期） ---
+score = st.session_state.score
+if score < 40:
+    # Lv20までは2問でレベルアップ
+    progress_val = (score % 2) / 2.0
+elif score < 130:
+    # Lv21〜50は3問でレベルアップ
+    progress_val = ((score - 40) % 3) / 3.0
+elif score < 290:
+    # Lv51〜90は4問でレベルアップ
+    progress_val = ((score - 130) % 4) / 4.0
+elif score < 340:
+    # Lv91〜100は5問でレベルアップ
+    progress_val = ((score - 290) % 5) / 5.0
+else:
+    # 創造主（Lv100）到達時は常にMAX
+    progress_val = 1.0
+
+st.progress(progress_val)
 # --- 問題表示 ---
 case = st.session_state.current_case
 st.info(f"**【患者データ】**\n\n**pH**: {case['pH']}　|　**PaCO2**: {case['PaCO2']} mmHg　|　**HCO3-**: {case['HCO3']} mEq/L")
