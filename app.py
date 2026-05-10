@@ -162,18 +162,39 @@ if st.session_state.is_game_over:
     
     st.stop() # ここで止めて下の問題を表示させない
 
-# --- ステータス表示 ---
-col1, col2, col3 = st.columns(3)
-col1.metric("現在の試練", f"第 {st.session_state.question_count} 問")
-col2.metric("現在のスコア", st.session_state.score)
-col3.metric("現在の階級", current_rank)
+# --- 階級判定とキャラクター決定 ---
+# (前回のロジックで current_lv, current_rank, character が決まっている前提)
 
-# 階級アップのプログレスバー
-st.progress((st.session_state.score % 2) / 2, text=f"次の階級まで... {'あと1問！' if (st.session_state.score % 2) != 0 else '出陣中'}")
+# --- 1行でスッキリ表示するステータスエリア ---
+st.markdown(f"""
+    <div style="
+        background-color: #1e1e1e; 
+        padding: 15px; 
+        border-radius: 10px; 
+        border-left: 5px solid #ff4b4b;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        color: white;
+    ">
+        <div style="text-align: center;">
+            <div style="font-size: 0.8rem; color: #aaa;">試練</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 0.8rem; color: #aaa;">レベル</div>
+            <div style="font-size: 1.2rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 2.5rem;">{character}</div>
+            <div style="font-size: 1rem; font-weight: bold;">{current_rank}</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-if st.session_state.feedback:
-    st.success(st.session_state.feedback)
-
+# 進行状況バー（細くしてシンプルに）
+st.progress((st.session_state.score % 2) / 2)
 # --- 問題表示 ---
 case = st.session_state.current_case
 st.info(f"**【患者データ】**\n\n**pH**: {case['pH']}　|　**PaCO2**: {case['PaCO2']} mmHg　|　**HCO3-**: {case['HCO3']} mEq/L")
