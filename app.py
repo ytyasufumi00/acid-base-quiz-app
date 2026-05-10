@@ -234,7 +234,12 @@ st.progress(progress_val)
 
 # --- 問題（患者データ）表示 ---
 case = st.session_state.current_case
-st.info(f"**pH**: {case['pH']} | **PaCO2**: {case['PaCO2']} | **HCO3-**: {case['HCO3']}")
+
+# 1. 単位を追加
+st.info(f"**pH**: {case['pH']} | **PaCO2**: {case['PaCO2']} mmHg | **HCO3-**: {case['HCO3']} mEq/L")
+
+# 2. 問題文を追加
+st.write("最も疑われる一次性の酸塩基平衡異常はどれですか？")
 
 
 # --- 視覚的な回答ボタン ---
