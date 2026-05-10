@@ -165,9 +165,25 @@ col3.metric("現在の階級", f"{character} Lv.{current_lv}")
 
 st.subheader(f"称号：{current_rank}")
 
-# --- 派手なゲームオーバー画面 ---
+# --- 派手なゲームオーバー画面（振り返り機能付き） ---
 if st.session_state.is_game_over:
-    st.error("💀 **無念、討死...！！** 正解は「" + st.session_state.current_case['answer'] + "」でした。")
+    failed_case = st.session_state.current_case # 討死した時のデータを保持
+    
+    st.error("💀 **無念、討死...！！**")
+    
+    # 【追加】問題の振り返りエリア
+    st.markdown(f"""
+        <div style="background-color: #4d0000; padding: 15px; border-radius: 10px; border: 1px solid #ff4b4b; margin-bottom: 20px; color: white;">
+            <p style="margin: 0; color: #ffbcbc; font-size: 0.8rem;">【討死した問題のデータ】</p>
+            <p style="font-size: 1.1rem; font-weight: bold; margin: 5px 0;">
+                pH: {failed_case['pH']} | PaCO2: {failed_case['PaCO2']} mmHg | HCO3-: {failed_case['HCO3']} mEq/L
+            </p>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #662222;">
+                <span style="font-size: 0.9rem;">正答：</span>
+                <span style="font-size: 1.2rem; font-weight: bold; color: #00ff00;">{failed_case['answer']}</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     # HTMLを使ってド派手な戦績カードを作成
     st.markdown(f"""
@@ -180,7 +196,6 @@ if st.session_state.is_game_over:
     </div>
     """, unsafe_allow_html=True)
     
-    # 10点以上（六文銭の旗持ち以上）なら風船でお祝い
     if st.session_state.last_score >= 10:
         st.balloons()
     
@@ -190,7 +205,7 @@ if st.session_state.is_game_over:
         st.session_state.current_case = generate_case()
         st.rerun()
     
-    st.stop() # ここで止めて下の問題を表示させない
+    st.stop()
 
 
 # --- ステータス表示（1行に集約） ---
