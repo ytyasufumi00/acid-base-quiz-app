@@ -243,7 +243,7 @@ bar_placeholder = st.empty()
 # 5. 【ここが魔法！】レベルアップした瞬間だけ、一瞬100%を表示して時間を止める
 if just_leveled_up:
     bar_placeholder.progress(1.0, text="✨ 見事！階級昇格！！ ✨")
-    time.sleep(0.2)  # 0.2秒間だけプレイヤーに100%のドヤ顔バーを見せつける
+    time.sleep(0.8)  # 0.8秒間だけプレイヤーに100%のドヤ顔バーを見せつける
 
 # 6. その後、通常のバー（0%や現在の状態）で上書きしてゲームを再開
 if progress_val == 1.0:
