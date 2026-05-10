@@ -140,9 +140,9 @@ rank_data = [
 # --- 後半ほど上がりづらいレベル計算ロジック（前回のまま） ---
 def calculate_level(score):
     if score <= 40: level = score // 2
-    elif score <= 130: level = 20 + (score - 40) // 3
-    elif score <= 290: level = 50 + (score - 130) // 4
-    else: level = 90 + (score - 290) // 5
+    elif score <= 70: level = 20 + (score - 40) // 3
+    elif score <= 90: level = 30 + (score - 70) // 4
+    else: level = 35 + (score - 90) // 5
     return min(level, 100)
 
 current_lv = calculate_level(st.session_state.score)
@@ -216,15 +216,15 @@ score = st.session_state.score
 if score < 40:
     # Lv20までは2問でレベルアップ (50%ずつ)
     progress_val = (score % 2) / 2.0
-elif score < 130:
+elif score < 70:
     # Lv21〜50は3問でレベルアップ (33%ずつ)
-    progress_val = ((score - 40) % 3) / 3.0
-elif score < 290:
+    progress_val = ((score - 70) % 3) / 3.0
+elif score < 90:
     # Lv51〜90は4問でレベルアップ (25%ずつ)
-    progress_val = ((score - 130) % 4) / 4.0
-elif score < 340:
+    progress_val = ((score - 90) % 4) / 4.0
+elif score < 115:
     # Lv91〜100は5問でレベルアップ (20%ずつ)
-    progress_val = ((score - 290) % 5) / 5.0
+    progress_val = ((score - 115) % 5) / 5.0
 else:
     # 創造主（Lv100）到達時は常にMAX
     progress_val = 1.0
