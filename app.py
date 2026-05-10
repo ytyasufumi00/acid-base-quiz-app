@@ -37,10 +37,10 @@ def save_score(name, score, rank):
         try:
             data = {"name": name, "score": score, "rank": rank}
             requests.post(GAS_URL, json=data)
-            load_ranking.clear() # 送信完了後にキャッシュをリセット
+            # 送信完了後、即座にキャッシュをクリアして最新を読み込めるようにする
+            load_ranking.clear() 
         except:
             pass
-    # 画面を止めずに裏側で通信をスタート
     thread = threading.Thread(target=_send_data)
     thread.start()
 
