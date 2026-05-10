@@ -165,33 +165,6 @@ if st.session_state.is_game_over:
 # --- 階級判定とキャラクター決定 ---
 # (前回のロジックで current_lv, current_rank, character が決まっている前提)
 
-# --- 1行でスッキリ表示するステータスエリア ---
-st.markdown(f"""
-    <div style="
-        background-color: #1e1e1e; 
-        padding: 15px; 
-        border-radius: 10px; 
-        border-left: 5px solid #ff4b4b;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        color: white;
-    ">
-        <div style="text-align: center;">
-            <div style="font-size: 0.8rem; color: #aaa;">試練</div>
-            <div style="font-size: 1.2rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
-        </div>
-        <div style="text-align: center;">
-            <div style="font-size: 0.8rem; color: #aaa;">レベル</div>
-            <div style="font-size: 1.2rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
-        </div>
-        <div style="text-align: center;">
-            <div style="font-size: 2.5rem;">{character}</div>
-            <div style="font-size: 1rem; font-weight: bold;">{current_rank}</div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
 
 # 進行状況バー（細くしてシンプルに）
 st.progress((st.session_state.score % 2) / 2)
