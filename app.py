@@ -111,7 +111,7 @@ if 'last_score' not in st.session_state: st.session_state.last_score = 0
 if 'last_rank' not in st.session_state: st.session_state.last_rank = ""
 if 'player_name' not in st.session_state: st.session_state.player_name = "名無し"
 
-st.title("信州上田　酸塩基合戦　⚔️")
+st.title("信州上田,　酸塩基合戦　⚔️")
 
 # --- サイドバー（ランキング） ---
 st.sidebar.header("🏆 歴代トップランカー")
