@@ -3,7 +3,9 @@ import random
 import requests
 import pandas as pd
 import threading
-import time  
+import time
+import math  
+
 
 # 発行したGASのURL　　　　
 GAS_URL = "https://script.google.com/macros/s/AKfycbyItu-Z6pmfnN-UUFME3I_YFv7rfujWFhI2oEsqFAW5CTu6AU7iZZuLEM7bBDRay5jU/exec"
