@@ -126,7 +126,7 @@ st.markdown(
 
         /* 2. ページ全体を「深い墨色（和紙のような黒）」に設定 */
         .stApp {
-            background: linear-gradient(135deg, #14110f 0%, #0a0807 100%);
+            background:linear-gradient(135deg, #132a13 0%, #001000 100%);
         }
 
         /* 3. タイトルや見出しを明朝体＋黄金色風に */
