@@ -219,27 +219,24 @@ else:
     bg_color = "#262730" # 通常の背景色
 
 # --- バトル画面UI（左：自分、右：敵） ---
+# --- バトル画面UI（左：自分、右：敵） ---
 st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else 'none'};">
-        
-        <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
-            <div style="font-size: 0.8rem; color: #888;">Lv.{current_lv} {current_rank}</div>
-            <div style="font-size: 2.5rem;">{character}</div>
-            <div style="font-size: 1rem; font-weight: bold; color: #4b9dff;">{st.session_state.player_name} 殿</div>
-        </div>
-        
-        <div style="text-align: center; flex: 1; padding: 0 10px;">
-            <div style="font-size: 1.5rem; font-weight: bold; color: #ff4b4b; font-style: italic;">VS</div>
-            <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
-        </div>
-        
-        <div style="text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
-            <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#888'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
-            <div style="font-size: 2.5rem;">{enemy_char}</div>
-            <div style="font-size: 1rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#ff9d4b'};">{enemy_name}</div>
-        </div>
-        
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else 'none'};">
+    <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
+        <div style="font-size: 0.8rem; color: #888;">Lv.{current_lv} {current_rank}</div>
+        <div style="font-size: 2.5rem;">{character}</div>
+        <div style="font-size: 1rem; font-weight: bold; color: #4b9dff;">{st.session_state.player_name} 殿</div>
     </div>
+    <div style="text-align: center; flex: 1; padding: 0 10px;">
+        <div style="font-size: 1.5rem; font-weight: bold; color: #ff4b4b; font-style: italic;">VS</div>
+        <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
+    </div>
+    <div style="text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
+        <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#888'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
+        <div style="font-size: 2.5rem;">{enemy_char}</div>
+        <div style="font-size: 1rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#ff9d4b'};">{enemy_name}</div>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 # --- 2. 進行状況バー（100%一瞬表示アニメーション付き） ---
