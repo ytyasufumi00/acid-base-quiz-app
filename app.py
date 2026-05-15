@@ -117,30 +117,41 @@ def handle_answer(user_selection, current_rank):
 # --- Streamlit UI設定 ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
-# 💡【修正1】和風デザインのCSSを一括適用
+# 💡【修正】背景を市松模様にし、中央に「白い巻物」のような領域を作る
 st.markdown(
     """
     <style>
         /* 1. 美しい筆文字風の明朝体「Shippori Mincho」を読み込み */
         @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&display=swap');
 
-        /* 2. ページ全体を「深い墨色（和紙のような黒）」に設定 */
+        /* 2. ページ全体（左右の余白）に若草色の「市松模様」を設定 */
         .stApp {
-            background: linear-gradient(135deg, #f0f7e6 0%, #d4e5b8 100%);
+            background-color: #f0f7e6; /* 若草色のベース */
+            background-image:
+                linear-gradient(45deg, #e2eed2 25%, transparent 25%, transparent 75%, #e2eed2 75%, #e2eed2),
+                linear-gradient(45deg, #e2eed2 25%, transparent 25%, transparent 75%, #e2eed2 75%, #e2eed2);
+            background-size: 60px 60px; /* 柄の大きさ */
+            background-position: 0 0, 30px 30px;
         }
 
-        /* 3. タイトルや見出しを明朝体＋黄金色風に */
+        /* 3. 中央の文字が表示される領域を「白」にして読みやすさを死守！ */
+        .block-container {
+            background-color: rgba(255, 255, 255, 0.95); /* ほんのり透ける白 */
+            padding: 3rem !important; /* 内側の余白 */
+            border-radius: 15px; /* 角を丸くして柔らかい印象に */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ふんわり影をつけて浮かせる */
+            margin-top: 20px;
+        }
+
+        /* 4. タイトルや見出しを明朝体に（若草色に合わせて渋い深緑に） */
         h1 {
             font-family: 'Shippori Mincho', serif !important;
-            color: #e6b422 !important; /* 和風の黄金色 */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            color: #4a5d23 !important; /* 渋い抹茶色 */
             text-align: center;
         }
         h2, h3 {
             font-family: 'Shippori Mincho', serif !important;
         }
-        
-        /* ※st.infoやst.write（問題文）には明朝体を適用しないため、従来通りの見やすさを維持します */
     </style>
     <script>document.documentElement.lang = 'ja';</script>
     <meta name="google" content="notranslate">
