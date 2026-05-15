@@ -35,37 +35,79 @@ def generate_case():
 
 # --- 症例生成ロジック（ボス戦・混合性異常用） ---
 def generate_boss_case():
-    boss_patterns = ["MetAc_RespAc", "MetAc_RespAlk", "RespAc_MetAc", "RespAc_MetAlk"]
-    pattern = random.choice(boss_patterns)
+    # 👿 全8パターンのボスに増強！
+    boss_patterns = [
+        "MetAc_RespAc", "MetAc_RespAlk", 
+        "RespAc_MetAc", "RespAc_MetAlk",
+        "MetAlk_RespAlk", "MetAlk_RespAc",
+        "RespAlk_MetAlk", "RespAlk_MetAc"
+    ]
+    
+    # 💡 安全装置：pHが一次性異常と一致するまで無限ループで作り直す
+    while True: 
+        pattern = random.choice(boss_patterns)
 
-    if pattern == "MetAc_RespAc":
-        primary = "代謝性アシドーシス"
-        answer = "呼吸性アシドーシス"
-        hco3 = random.randint(10, 16)
-        expected_paco2 = 1.5 * hco3 + 8
-        paco2 = int(expected_paco2 + random.randint(8, 15)) 
-    elif pattern == "MetAc_RespAlk":
-        primary = "代謝性アシドーシス"
-        answer = "呼吸性アルカローシス"
-        hco3 = random.randint(12, 18)
-        expected_paco2 = 1.5 * hco3 + 8
-        paco2 = int(expected_paco2 - random.randint(8, 15)) 
-    elif pattern == "RespAc_MetAc":
-        primary = "呼吸性アシドーシス"
-        answer = "代謝性アシドーシス"
-        paco2 = random.randint(55, 70)
-        expected_hco3 = 24 + 0.1 * (paco2 - 40) 
-        hco3 = int(expected_hco3 - random.randint(5, 10))
-    elif pattern == "RespAc_MetAlk":
-        primary = "呼吸性アシドーシス"
-        answer = "代謝性アルカローシス"
-        paco2 = random.randint(50, 65)
-        expected_hco3 = 24 + 0.1 * (paco2 - 40)
-        hco3 = int(expected_hco3 + random.randint(6, 12))
+        if pattern == "MetAc_RespAc":
+            primary = "代謝性アシドーシス"
+            answer = "呼吸性アシドーシス"
+            hco3 = random.randint(10, 18)
+            expected_paco2 = 1.5 * hco3 + 8
+            paco2 = int(expected_paco2 + random.randint(6, 12))
+        elif pattern == "MetAc_RespAlk":
+            primary = "代謝性アシドーシス"
+            answer = "呼吸性アルカローシス"
+            hco3 = random.randint(10, 18)
+            expected_paco2 = 1.5 * hco3 + 8
+            paco2 = int(expected_paco2 - random.randint(4, 8))
+        elif pattern == "RespAc_MetAc":
+            primary = "呼吸性アシドーシス"
+            answer = "代謝性アシドーシス"
+            paco2 = random.randint(50, 70)
+            expected_hco3 = 24 + 0.1 * (paco2 - 40)
+            hco3 = int(expected_hco3 - random.randint(4, 8))
+        elif pattern == "RespAc_MetAlk":
+            primary = "呼吸性アシドーシス"
+            answer = "代謝性アルカローシス"
+            paco2 = random.randint(50, 70)
+            expected_hco3 = 24 + 0.1 * (paco2 - 40)
+            hco3 = int(expected_hco3 + random.randint(6, 12))
+        elif pattern == "MetAlk_RespAlk":
+            primary = "代謝性アルカローシス"
+            answer = "呼吸性アルカローシス"
+            hco3 = random.randint(30, 40)
+            expected_paco2 = 40 + 0.7 * (hco3 - 24)
+            paco2 = int(expected_paco2 - random.randint(6, 12))
+        elif pattern == "MetAlk_RespAc":
+            primary = "代謝性アルカローシス"
+            answer = "呼吸性アシドーシス"
+            hco3 = random.randint(30, 40)
+            expected_paco2 = 40 + 0.7 * (hco3 - 24)
+            paco2 = int(expected_paco2 + random.randint(4, 8))
+        elif pattern == "RespAlk_MetAlk":
+            primary = "呼吸性アルカローシス"
+            answer = "代謝性アルカローシス"
+            paco2 = random.randint(20, 30)
+            expected_hco3 = 24 - 0.2 * (40 - paco2)
+            hco3 = int(expected_hco3 + random.randint(4, 8))
+        elif pattern == "RespAlk_MetAc":
+            primary = "呼吸性アルカローシス"
+            answer = "代謝性アシドーシス"
+            paco2 = random.randint(20, 30)
+            expected_hco3 = 24 - 0.2 * (40 - paco2)
+            hco3 = int(expected_hco3 - random.randint(4, 8))
 
-    ph = 6.1 + math.log10(hco3 / (0.03 * paco2))
-    return {"pH": round(ph, 2), "PaCO2": paco2, "HCO3": hco3, "answer": answer, "primary": primary, "is_boss": True}
+        # pHの計算
+        ph = 6.1 + math.log10(hco3 / (0.03 * paco2))
+        ph = round(ph, 2)
+        
+        # 🛡️ ここが鉄壁の安全装置！
+        # pHの方向（7.40未満/以上）と一次性異常が一致しているかチェック
+        if "アシドーシス" in primary and ph < 7.40:
+            break  # 一致していればループを抜けて出題！
+        if "アルカローシス" in primary and ph > 7.40:
+            break  # 一致していればループを抜けて出題！
 
+    return {"pH": ph, "PaCO2": paco2, "HCO3": hco3, "answer": answer, "primary": primary, "is_boss": True}
 # --- 通信用の関数（爆速化） ---
 def save_score(name, score, rank):
     def _send_data():
