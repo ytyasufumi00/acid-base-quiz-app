@@ -116,9 +116,32 @@ def handle_answer(user_selection, current_rank):
 
 # --- Streamlit UI設定 ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
+
+# 💡【修正1】和風デザインのCSSを一括適用
 st.markdown(
     """
-    <style>/* ページ全体を翻訳対象外に設定 */</style>
+    <style>
+        /* 1. 美しい筆文字風の明朝体「Shippori Mincho」を読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&display=swap');
+
+        /* 2. ページ全体を「深い墨色（和紙のような黒）」に設定 */
+        .stApp {
+            background: linear-gradient(135deg, #14110f 0%, #0a0807 100%);
+        }
+
+        /* 3. タイトルや見出しを明朝体＋黄金色風に */
+        h1 {
+            font-family: 'Shippori Mincho', serif !important;
+            color: #e6b422 !important; /* 和風の黄金色 */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+        h2, h3 {
+            font-family: 'Shippori Mincho', serif !important;
+        }
+        
+        /* ※st.infoやst.write（問題文）には明朝体を適用しないため、従来通りの見やすさを維持します */
+    </style>
     <script>document.documentElement.lang = 'ja';</script>
     <meta name="google" content="notranslate">
     """,
@@ -232,21 +255,22 @@ else:
     random.seed() 
     bg_color = "#262730" 
 
+# --- バトル画面UI（左：自分、右：敵） ---
 st.markdown(f"""
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else 'none'};">
+<div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
     <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
-        <div style="font-size: 0.8rem; color: #888;">Lv.{current_lv} {current_rank}</div>
+        <div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
         <div style="font-size: 2.5rem;">{character}</div>
-        <div style="font-size: 1rem; font-weight: bold; color: #4b9dff;">{st.session_state.player_name} 殿</div>
+        <div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
     </div>
     <div style="text-align: center; flex: 1; padding: 0 10px;">
-        <div style="font-size: 1.5rem; font-weight: bold; color: #ff4b4b; font-style: italic;">VS</div>
+        <div style="font-size: 1.8rem; font-weight: bold; color: #ff4b4b; text-shadow: 0 0 8px #ff0000;">VS</div>
         <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
     </div>
     <div style="text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
-        <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#888'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
+        <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#aaa'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
         <div style="font-size: 2.5rem;">{enemy_char}</div>
-        <div style="font-size: 1rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#ff9d4b'};">{enemy_name}</div>
+        <div style="font-size: 1.2rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#e6b422'};">{enemy_name}</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
