@@ -219,7 +219,6 @@ else:
     bg_color = "#262730" # 通常の背景色
 
 # --- バトル画面UI（左：自分、右：敵） ---
-# --- バトル画面UI（左：自分、右：敵） ---
 st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else 'none'};">
     <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
