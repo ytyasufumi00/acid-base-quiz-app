@@ -152,7 +152,11 @@ st.markdown(
         }
         h2, h3 {
             font-family: 'Shippori Mincho', serif !important;
+    /* 📱 スマホのダークモード対策：白飛びを防ぐため文字色を濃いグレーに固定 */
+        p, label {
+            color: #2c3e50 !important; 
         }
+        /* ヘッダーの白い帯を透明にして市松模様を一番上まで広げる */
         header {
             background-color: transparent !important;
         }
