@@ -201,21 +201,44 @@ elif current_lv < 100:
 else:
     current_rank, character = "創造主", "🌌"
 
-# --- 1. ステータス表示（1行に集約） ---
+# --- 1. 敵キャラとボス判定ロジック（UIテスト用） ---
+# 現在の問題数が10の倍数ならボス、それ以外は雑魚
+is_boss = (st.session_state.question_count % 10 == 0)
+
+if is_boss:
+    enemy_char = "🐉"
+    enemy_name = "混合性異常ドラゴン (BOSS)"
+    bg_color = "#4d0000" # ボス戦は背景を赤黒くして威圧感を出す
+else:
+    # 雑魚敵を適当にランダム表示
+    zako_list = [("🧟", "アシデミア歩兵"), ("🥷", "アルカレミア忍者"), ("👻", "過換気ゴースト"), ("💩", "下痢スライム")]
+    # 問題番号をシードにして、同じ問題中は敵がコロコロ変わらないようにする
+    random.seed(st.session_state.question_count) 
+    enemy_char, enemy_name = random.choice(zako_list)
+    random.seed() # シードを戻す
+    bg_color = "#262730" # 通常の背景色
+
+# --- バトル画面UI（左：自分、右：敵） ---
 st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #262730; border-radius: 10px; margin-bottom: 20px; color: white;">
-        <div style="text-align: center; flex: 1;">
-            <div style="font-size: 0.7rem; color: #888;">試練</div>
-            <div style="font-size: 1.1rem; font-weight: bold;">第 {st.session_state.question_count} 問</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else 'none'};">
+        
+        <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
+            <div style="font-size: 0.8rem; color: #888;">Lv.{current_lv} {current_rank}</div>
+            <div style="font-size: 2.5rem;">{character}</div>
+            <div style="font-size: 1rem; font-weight: bold; color: #4b9dff;">{st.session_state.player_name} 殿</div>
         </div>
-        <div style="text-align: center; flex: 1; border-left: 1px solid #444; border-right: 1px solid #444;">
-            <div style="font-size: 0.7rem; color: #888;">レベル</div>
-            <div style="font-size: 1.1rem; font-weight: bold; color: #ff4b4b;">Lv.{current_lv}</div>
+        
+        <div style="text-align: center; flex: 1; padding: 0 10px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #ff4b4b; font-style: italic;">VS</div>
+            <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
         </div>
-        <div style="text-align: center; flex: 2;">
-            <div style="font-size: 1.8rem;">{character}</div>
-            <div style="font-size: 0.9rem; font-weight: bold;">{current_rank}</div>
+        
+        <div style="text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
+            <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#888'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
+            <div style="font-size: 2.5rem;">{enemy_char}</div>
+            <div style="font-size: 1rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#ff9d4b'};">{enemy_name}</div>
         </div>
+        
     </div>
 """, unsafe_allow_html=True)
 
