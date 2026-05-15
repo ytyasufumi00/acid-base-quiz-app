@@ -305,10 +305,27 @@ else:
 
 is_boss = (st.session_state.question_count % 10 == 0)
 
+# --- 1. 敵キャラとボス判定ロジック ---
+is_boss = (st.session_state.question_count % 10 == 0)
+
 if is_boss:
-    enemy_char = "🐉"
-    enemy_name = "混合性異常ドラゴン (BOSS)"
-    bg_color = "#4d0000" 
+    # 👿 ボス敵のリスト（重症病態や代償逸脱をモチーフに）
+    boss_list = [
+        ("🐉", "混合性異常ドラゴン"),
+        ("👹", "代償逸脱の鬼将軍"),
+        ("👺", "多重病態の大天狗"),
+        ("💀", "敗血症ショックの怨霊"),
+        ("🐍", "致死性アシデミア大蛇"),
+        ("🌋", "重症DKAの業火"),
+        ("👁️", "酸塩基を統べる魔王")
+    ]
+    # 問題番号をシードにしてボスを決定（画面更新でコロコロ変わるのを防ぐ）
+    random.seed(st.session_state.question_count) 
+    enemy_char, enemy_name = random.choice(boss_list)
+    random.seed() 
+    
+    enemy_name = f"{enemy_name} (BOSS)" # 威圧感を出すためにBOSSをつける
+    bg_color = "#4d0000" # ボス戦は背景を赤黒くして威圧感を出す
 else:
     zako_list = [
         ("🧟", "アシデミア歩兵"), 
