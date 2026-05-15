@@ -33,7 +33,24 @@ def generate_case():
         ph = 7.40 + (40 - paco2) * 0.008 + random.uniform(0, 0.02)
 
     return {"pH": round(ph, 2), "PaCO2": paco2, "HCO3": hco3, "answer": primary}
-
+def handle_answer(user_selection, current_rank):
+    case = st.session_state.current_case
+    if user_selection == case["answer"]:
+        st.session_state.feedback = f"✅ 見事！正解です（{user_selection}）。"
+        st.session_state.score += 1
+        st.session_state.question_count += 1
+        
+        # 💡 ここを変更！次が10の倍数問目ならボスを生成！
+        if st.session_state.question_count % 10 == 0:
+            st.session_state.current_case = generate_boss_case()
+        else:
+            st.session_state.current_case = generate_case()
+            
+    else:
+        # 討死処理（ここはそのまま変更なし）
+        st.session_state.feedback = "" 
+        st.session_state.last_score = st.session_state.score
+        # ... (以下略) ...
 # --- 通信用の関数（爆速化） ---
 def save_score(name, score, rank):
     def _send_data():
@@ -62,14 +79,18 @@ def load_ranking():
     except:
         return []
 
-# --- ここ（54行目付近）に追加 ---
 def handle_answer(user_selection, current_rank):
     case = st.session_state.current_case
     if user_selection == case["answer"]:
         st.session_state.feedback = f"✅ 見事！正解です（{user_selection}）。"
         st.session_state.score += 1
         st.session_state.question_count += 1
-        st.session_state.current_case = generate_case()
+        
+        # 💡 ここを変更！次が10の倍数問目ならボスを生成！
+        if st.session_state.question_count % 10 == 0:
+            st.session_state.current_case = generate_boss_case()
+        else:
+            st.session_state.current_case = generate_case()
     else:
         # 討死処理
         st.session_state.feedback = "" 
