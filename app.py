@@ -93,6 +93,7 @@ def handle_answer(user_selection, current_rank):
         st.session_state.feedback = f"✅ 見事！正解です（{user_selection}）。"
         st.session_state.score += 1
         st.session_state.question_count += 1
+        st.session_state.just_correct = True
         
         # 次が10の倍数問目ならボスを生成！
         if st.session_state.question_count % 10 == 0:
