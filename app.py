@@ -152,6 +152,9 @@ st.markdown(
         h2, h3 {
             font-family: 'Shippori Mincho', serif !important;
         }
+        header {
+            background-color: transparent !important;
+        }
     </style>
     <script>document.documentElement.lang = 'ja';</script>
     <meta name="google" content="notranslate">
