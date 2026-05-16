@@ -313,10 +313,10 @@ else:
 # --- 💥 敵を討ち取った時のエフェクト生成 ---
 battle_effect = ""
 if st.session_state.get("just_correct", False):
-    # 💡【修正】改行と先頭のスペースを完全に排除し、1行のコードにまとめました！
-    battle_effect = "<div style='position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp 1.5s ease-out forwards;'>💥 討ち取ったり！</div><style>@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); } 80% { opacity: 1; transform: translate(-50%, -20px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1); } }</style>"
-    st.session_state.just_correct = False # エフェクトを作った後にフラグを消す
-
+    # 💡 アニメーション名（floatUp_〇〇）に問題番号を混ぜて、毎回「新しいアニメーション」だとブラウザに錯覚させる！
+    c = st.session_state.question_count
+    battle_effect = f"<div style='position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp_{c} 1.5s ease-out forwards;'>💥 討ち取ったり！</div><style>@keyframes floatUp_{c} {{ 0% {{ opacity: 0; transform: translate(-50%, 20px) scale(0.5); }} 15% {{ opacity: 1; transform: translate(-50%, -10px) scale(1.2); }} 80% {{ opacity: 1; transform: translate(-50%, -20px) scale(1); }} 100% {{ opacity: 0; transform: translate(-50%, -50px) scale(1); }} }}</style>"
+    st.session_state.just_correct = False
 # 💡 コードブロック化のバグを防ぐため、HTMLの字下げ（インデント）を左端に詰めています
 html_ui = f"""
 <div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
