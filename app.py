@@ -152,6 +152,34 @@ def handle_answer(user_selection, current_rank):
 # --- Streamlit UI設定 ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
+# 👇 ★追加：【超強力版】翻訳ポップアップ完全撃退スクリプト
+import streamlit.components.v1 as components
+components.html(
+    """
+    <script>
+        // Streamlitの親枠（一番外側のHTML）を直接操作する
+        const parentDoc = window.parent.document;
+        
+        // 1. 言語を強制的に日本語に書き換え
+        parentDoc.documentElement.lang = 'ja';
+        
+        // 2. ページ全体に「翻訳ツール絶対禁止（notranslate）」の呪文を付与
+        parentDoc.documentElement.classList.add('notranslate');
+        parentDoc.body.classList.add('notranslate');
+        
+        // 3. metaタグもhead領域の最上部に強制的にねじ込む
+        if (!parentDoc.querySelector('meta[name="google"]')) {
+            let meta = parentDoc.createElement('meta');
+            meta.name = "google";
+            meta.content = "notranslate";
+            parentDoc.head.appendChild(meta);
+        }
+    </script>
+    """,
+    height=0, width=0
+)
+
+# 💡 UIデザイン（CSSのみにスッキリ整理しました）
 st.markdown(
     """
     <style>
@@ -181,7 +209,7 @@ st.markdown(
         }
         h2, h3 {
             font-family: 'Shippori Mincho', serif !important;
-        } /* 💡 ここに } を補完しました！ */
+        }
 
         p, label {
             color: #2c3e50 !important; 
@@ -190,8 +218,6 @@ st.markdown(
             background-color: transparent !important;
         }
     </style>
-    <script>document.documentElement.lang = 'ja';</script>
-    <meta name="google" content="notranslate">
     """,
     unsafe_allow_html=True
 )
