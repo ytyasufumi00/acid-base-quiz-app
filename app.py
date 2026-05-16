@@ -350,11 +350,31 @@ else:
     random.seed() 
     bg_color = "#262730" 
 
+# --- 💥 敵を討ち取った時のエフェクト生成 ---
+battle_effect = ""
+if st.session_state.get("just_correct", False):
+    battle_effect = """
+    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); 
+                color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap;
+                text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; 
+                z-index: 10; animation: floatUp 1.5s ease-out forwards;">
+        💥 討ち取ったり！
+    </div>
+    <style>
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); }
+            15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); }
+            80% { opacity: 1; transform: translate(-50%, -20px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50px) scale(1); }
+        }
+    </style>
+    """
+
 # --- バトル画面UI（左：自分、右：敵） ---
 st.markdown(f"""
 <div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
     <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
-        <div style="font-size: 1.2rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
+        <div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
         <div style="font-size: 2.5rem;">{character}</div>
         <div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
     </div>
@@ -362,7 +382,8 @@ st.markdown(f"""
         <div style="font-size: 1.8rem; font-weight: bold; color: #ff4b4b; text-shadow: 0 0 8px #ff0000;">VS</div>
         <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
     </div>
-    <div style="text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
+    <div style="position: relative; text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
+        {battle_effect}
         <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#aaa'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
         <div style="font-size: 2.5rem;">{enemy_char}</div>
         <div style="font-size: 1.2rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#e6b422'};">{enemy_name}</div>
