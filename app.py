@@ -295,7 +295,10 @@ if st.session_state.is_game_over:
 # ⚔️ ゲーム継続中画面
 # ==========================================
 current_lv = calculate_level(st.session_state.score)
-
+# 👇 ★ここに追加！目印があったらポップアップを出して、目印を消す
+if st.session_state.get("just_correct", False):
+    st.toast("見事！敵を討ち取ったり！ 💮", icon="⚔️")
+    st.session_state.just_correct = False
 if current_lv < len(rank_data):
     current_rank, character = rank_data[current_lv]
 elif current_lv < 100:
