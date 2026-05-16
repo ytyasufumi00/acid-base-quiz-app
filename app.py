@@ -35,7 +35,6 @@ def generate_case():
 
 # --- 症例生成ロジック（ボス戦・混合性異常用） ---
 def generate_boss_case():
-    # 👿 全8パターンのボスに増強！
     boss_patterns = [
         "MetAc_RespAc", "MetAc_RespAlk", 
         "RespAc_MetAc", "RespAc_MetAlk",
@@ -43,7 +42,6 @@ def generate_boss_case():
         "RespAlk_MetAlk", "RespAlk_MetAc"
     ]
     
-    # 💡 安全装置：pHが一次性異常と一致するまで無限ループで作り直す
     while True: 
         pattern = random.choice(boss_patterns)
 
@@ -96,19 +94,15 @@ def generate_boss_case():
             expected_hco3 = 24 - 0.2 * (40 - paco2)
             hco3 = int(expected_hco3 - random.randint(4, 8))
 
-        # pHの計算
         ph = 6.1 + math.log10(hco3 / (0.03 * paco2))
         ph = round(ph, 2)
         
-        # 🛡️ ここが鉄壁の安全装置！
-        # pHの方向（7.40未満/以上）と一次性異常が一致しているかチェック
-        if "アシドーシス" in primary and ph < 7.40:
-            break  # 一致していればループを抜けて出題！
-        if "アルカローシス" in primary and ph > 7.40:
-            break  # 一致していればループを抜けて出題！
+        if "アシドーシス" in primary and ph < 7.40: break
+        if "アルカローシス" in primary and ph > 7.40: break
 
     return {"pH": ph, "PaCO2": paco2, "HCO3": hco3, "answer": answer, "primary": primary, "is_boss": True}
-# --- 通信用の関数（爆速化） ---
+
+# --- 通信用の関数 ---
 def save_score(name, score, rank):
     def _send_data():
         try:
@@ -135,15 +129,13 @@ def handle_answer(user_selection, current_rank):
         st.session_state.feedback = f"✅ 見事！正解です（{user_selection}）。"
         st.session_state.score += 1
         st.session_state.question_count += 1
-        st.session_state.just_correct = True
+        st.session_state.just_correct = True # 討伐エフェクトの目印
         
-        # 次が10の倍数問目ならボスを生成！
         if st.session_state.question_count % 10 == 0:
             st.session_state.current_case = generate_boss_case()
         else:
             st.session_state.current_case = generate_case()
     else:
-        # 討死処理
         st.session_state.feedback = "" 
         st.session_state.last_score = st.session_state.score
         st.session_state.last_rank = current_rank
@@ -160,45 +152,40 @@ def handle_answer(user_selection, current_rank):
 # --- Streamlit UI設定 ---
 st.set_page_config(page_title="酸塩基平衡アタック", page_icon="⚔️")
 
-# 💡【修正】背景を市松模様にし、中央に「白い巻物」のような領域を作る
 st.markdown(
     """
     <style>
-        /* 1. 美しい筆文字風の明朝体「Shippori Mincho」を読み込み */
         @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&display=swap');
 
-        /* 2. ページ全体（左右の余白）に若草色の「市松模様」を設定 */
         .stApp {
-            background-color: #f0f7e6; /* 若草色のベース */
+            background-color: #f0f7e6; 
             background-image:
                 linear-gradient(45deg, #e2eed2 25%, transparent 25%, transparent 75%, #e2eed2 75%, #e2eed2),
                 linear-gradient(45deg, #e2eed2 25%, transparent 25%, transparent 75%, #e2eed2 75%, #e2eed2);
-            background-size: 60px 60px; /* 柄の大きさ */
+            background-size: 60px 60px; 
             background-position: 0 0, 30px 30px;
         }
 
-        /* 3. 中央の文字が表示される領域を「白」にして読みやすさを死守！ */
         .block-container {
-            background-color: rgba(255, 255, 255, 0.95); /* ほんのり透ける白 */
-            padding: 3rem !important; /* 内側の余白 */
-            border-radius: 15px; /* 角を丸くして柔らかい印象に */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ふんわり影をつけて浮かせる */
+            background-color: rgba(255, 255, 255, 0.95); 
+            padding: 3rem !important; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
             margin-top: 20px;
         }
 
-        /* 4. タイトルや見出しを明朝体に（若草色に合わせて渋い深緑に） */
         h1 {
             font-family: 'Shippori Mincho', serif !important;
-            color: #4a5d23 !important; /* 渋い抹茶色 */
+            color: #4a5d23 !important; 
             text-align: center;
         }
         h2, h3 {
             font-family: 'Shippori Mincho', serif !important;
-    /* 📱 スマホのダークモード対策：白飛びを防ぐため文字色を濃いグレーに固定 */
+        } /* 💡 ここに } を補完しました！ */
+
         p, label {
             color: #2c3e50 !important; 
         }
-        /* ヘッダーの白い帯を透明にして市松模様を一番上まで広げる */
         header {
             background-color: transparent !important;
         }
@@ -209,7 +196,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# セッションステート初期化
 if 'score' not in st.session_state: st.session_state.score = 0
 if 'question_count' not in st.session_state: st.session_state.question_count = 1
 if 'current_case' not in st.session_state: st.session_state.current_case = generate_case()
@@ -221,7 +207,6 @@ if 'player_name' not in st.session_state: st.session_state.player_name = "名無
 
 st.title("信州上田　酸塩基合戦　⚔️")
 
-# --- サイドバー（ランキング） ---
 st.sidebar.header("🏆 歴代トップランカー")
 try:
     ranking_data = load_ranking()
@@ -235,7 +220,6 @@ except:
 st.session_state.player_name = st.text_input("あなたの名前（武将名）を入力して出陣！", st.session_state.player_name)
 st.markdown("---")
 
-# --- 階級リスト ---
 rank_data = [
     ("農民", "🌾"), ("迷子の足軽", "🏃‍♂️"), ("いけてる足軽", "✨"), ("槍の又左のパシリ", "👣"), ("運のいい足軽頭", "🍀"),("当直明けのゾンビ", "🧟"),
     ("影武者の影武者", "👥"), ("疾風の忍び", "🥷"), ("闇夜の暗殺者", "🗡️"), ("独眼竜の右目", "👁️"), ("傾奇者", "👘"),
@@ -252,7 +236,6 @@ def calculate_level(score):
     elif score <= 90: return 30 + (score - 70) // 4
     else: return min(35 + (score - 90) // 5, 100)
 
-# --- ゲームオーバー画面 ---
 if st.session_state.is_game_over:
     failed_case = st.session_state.current_case
     st.error("💀 **無念、討死...！！**")
@@ -280,8 +263,7 @@ if st.session_state.is_game_over:
     </div>
     """, unsafe_allow_html=True)
     
-    if st.session_state.last_score >= 10:
-        st.balloons()
+    if st.session_state.last_score >= 10: st.balloons()
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔄 新たな戦（ゲーム）を始める", use_container_width=True, type="primary"):
@@ -290,14 +272,11 @@ if st.session_state.is_game_over:
         st.rerun()
     st.stop() 
 
-
 # ==========================================
 # ⚔️ ゲーム継続中画面
 # ==========================================
 current_lv = calculate_level(st.session_state.score)
-# 👇 ★ここに追加！目印があったらポップアップを出して、目印を消す
-if st.session_state.get("just_correct", False):
-    st.session_state.just_correct = False
+
 if current_lv < len(rank_data):
     current_rank, character = rank_data[current_lv]
 elif current_lv < 100:
@@ -307,44 +286,26 @@ else:
 
 is_boss = (st.session_state.question_count % 10 == 0)
 
-# --- 1. 敵キャラとボス判定ロジック ---
-is_boss = (st.session_state.question_count % 10 == 0)
-
 if is_boss:
-    # 👿 ボス敵のリスト（重症病態や代償逸脱をモチーフに）
     boss_list = [
-        ("🐉", "混合性異常ドラゴン"),
-        ("👹", "代償逸脱の鬼将軍"),
-        ("👺", "多重病態の大天狗"),
-        ("💀", "敗血症ショックの怨霊"),
-        ("🐍", "致死性アシデミア大蛇"),
-        ("🌋", "重症DKAの業火"),
-        ("👁️", "酸塩基を統べる魔王")
+        ("🐉", "混合性異常ドラゴン"), ("👹", "代償逸脱の鬼将軍"), ("👺", "多重病態の大天狗"),
+        ("💀", "敗血症ショックの怨霊"), ("🐍", "致死性アシデミア大蛇"),
+        ("🌋", "重症DKAの業火"), ("👁️", "酸塩基を統べる魔王")
     ]
-    # 問題番号をシードにしてボスを決定（画面更新でコロコロ変わるのを防ぐ）
     random.seed(st.session_state.question_count) 
     enemy_char, enemy_name = random.choice(boss_list)
     random.seed() 
-    
-    enemy_name = f"{enemy_name} (BOSS)" # 威圧感を出すためにBOSSをつける
-    bg_color = "#4d0000" # ボス戦は背景を赤黒くして威圧感を出す
+    enemy_name = f"{enemy_name} (BOSS)" 
+    bg_color = "#4d0000" 
 else:
     zako_list = [
-        ("🧟", "アシデミア歩兵"), 
-        ("🥷", "アルカレミア忍者"), 
-        ("👻", "過換気ゴースト"), 
-        ("💩", "下痢スライム"),
-        ("💃", "嘔吐くノ一"),          # 代アル（胃酸喪失）
-        ("👲", "乳酸戦士"),           # 代アシ（AG開大）
-        ("👹", "ケトン武者"),         # 代アシ（DKA等）
-        ("👺", "アルドステロン大名"), # 代アル（原発性アルドステロン症）
-        ("💊", "利尿薬商人"),         # 代アル（ループ/サイアザイド系）
-        ("💨", "COPDだるま"),         # 呼アシ（肺胞低換気）
-        ("💤", "鎮静剤の眠り猫"),     # 呼アシ（呼吸抑制）
-        ("📿", "尿毒症坊主"),         # 代アシ（腎不全）
-        ("🏃", "尿細管足軽"),         # 代アシ（RTA: AG正常）
-        ("🌪️", "パニック天狗")        # 呼アル（過換気症候群）
+        ("🧟", "アシデミア歩兵"), ("🥷", "アルカレミア忍者"), ("👻", "過換気ゴースト"), 
+        ("💩", "下痢スライム"), ("💃", "嘔吐くノ一"), ("👲", "乳酸戦士"), 
+        ("👹", "ケトン武者"), ("👺", "アルドステロン大名"), ("💊", "利尿薬商人"), 
+        ("💨", "COPDだるま"), ("💤", "鎮静剤の眠り猫"), ("📿", "尿毒症坊主"), 
+        ("🏃", "尿細管足軽"), ("🌪️", "パニック天狗")
     ]
+    random.seed(st.session_state.question_count)
     enemy_char, enemy_name = random.choice(zako_list)
     random.seed() 
     bg_color = "#262730" 
@@ -353,42 +314,32 @@ else:
 battle_effect = ""
 if st.session_state.get("just_correct", False):
     battle_effect = """
-    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); 
-                color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap;
-                text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; 
-                z-index: 10; animation: floatUp 1.5s ease-out forwards;">
-        💥 討ち取ったり！
-    </div>
-    <style>
-        @keyframes floatUp {
-            0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); }
-            15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); }
-            80% { opacity: 1; transform: translate(-50%, -20px) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50px) scale(1); }
-        }
-    </style>
+    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp 1.5s ease-out forwards;">💥 討ち取ったり！</div>
+    <style>@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); } 80% { opacity: 1; transform: translate(-50%, -20px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1); } }</style>
     """
+    st.session_state.just_correct = False # 💡 エフェクトを作った後にフラグを消す（順番を修正）
 
-# --- バトル画面UI（左：自分、右：敵） ---
-st.markdown(f"""
+# 💡 コードブロック化のバグを防ぐため、HTMLの字下げ（インデント）を左端に詰めています
+html_ui = f"""
 <div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
-    <div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
-        <div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
-        <div style="font-size: 2.5rem;">{character}</div>
-        <div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
-    </div>
-    <div style="text-align: center; flex: 1; padding: 0 10px;">
-        <div style="font-size: 1.8rem; font-weight: bold; color: #ff4b4b; text-shadow: 0 0 8px #ff0000;">VS</div>
-        <div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
-    </div>
-    <div style="position: relative; text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
-        {battle_effect}
-        <div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#aaa'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
-        <div style="font-size: 2.5rem;">{enemy_char}</div>
-        <div style="font-size: 1.2rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#e6b422'};">{enemy_name}</div>
-    </div>
+<div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
+<div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
+<div style="font-size: 2.5rem;">{character}</div>
+<div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
 </div>
-""", unsafe_allow_html=True)
+<div style="text-align: center; flex: 1; padding: 0 10px;">
+<div style="font-size: 1.8rem; font-weight: bold; color: #ff4b4b; text-shadow: 0 0 8px #ff0000;">VS</div>
+<div style="font-size: 0.8rem; color: #aaa;">第 {st.session_state.question_count} 問</div>
+</div>
+<div style="position: relative; text-align: center; flex: 2; border-left: 2px solid #444; padding-left: 10px;">
+{battle_effect}
+<div style="font-size: 0.8rem; color: {'#ffbcbc' if is_boss else '#aaa'};">{'⚠️ 10問目の試練' if is_boss else '雑魚敵'}</div>
+<div style="font-size: 2.5rem;">{enemy_char}</div>
+<div style="font-size: 1.2rem; font-weight: bold; color: {'#ff4b4b' if is_boss else '#e6b422'};">{enemy_name}</div>
+</div>
+</div>
+"""
+st.markdown(html_ui, unsafe_allow_html=True)
 
 if 'last_rendered_lv' not in st.session_state:
     st.session_state.last_rendered_lv = current_lv
