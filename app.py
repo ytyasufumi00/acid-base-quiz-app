@@ -313,11 +313,9 @@ else:
 # --- 💥 敵を討ち取った時のエフェクト生成 ---
 battle_effect = ""
 if st.session_state.get("just_correct", False):
-    battle_effect = """
-    <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp 1.5s ease-out forwards;">💥 討ち取ったり！</div>
-    <style>@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); } 80% { opacity: 1; transform: translate(-50%, -20px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1); } }</style>
-    """
-    st.session_state.just_correct = False # 💡 エフェクトを作った後にフラグを消す（順番を修正）
+    # 💡【修正】改行と先頭のスペースを完全に排除し、1行のコードにまとめました！
+    battle_effect = "<div style='position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp 1.5s ease-out forwards;'>💥 討ち取ったり！</div><style>@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.2); } 80% { opacity: 1; transform: translate(-50%, -20px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1); } }</style>"
+    st.session_state.just_correct = False # エフェクトを作った後にフラグを消す
 
 # 💡 コードブロック化のバグを防ぐため、HTMLの字下げ（インデント）を左端に詰めています
 html_ui = f"""
