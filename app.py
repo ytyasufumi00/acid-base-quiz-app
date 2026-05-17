@@ -314,6 +314,17 @@ elif current_lv < 100:
 else:
     current_rank, character = "創造主", "🌌"
 
+# 💡【修正】階級昇格の判定をUIを描画する前に移動しました
+if 'last_rendered_lv' not in st.session_state:
+    st.session_state.last_rendered_lv = current_lv
+just_leveled_up = current_lv > st.session_state.last_rendered_lv
+st.session_state.last_rendered_lv = current_lv 
+
+# 🆙 自分の階級昇格エフェクト生成（ブラウザキャッシュ対策に現在のLvを名前に付与）
+level_effect = ""
+if just_leveled_up:
+    level_effect = f"<div style='position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: levelUp_{current_lv} 1.5s ease-out forwards;'>✨ 階級昇格！</div><style>@keyframes levelUp_{current_lv} {{ 0% {{ opacity: 0; transform: translate(-50%, 20px) scale(0.5); }} 15% {{ opacity: 1; transform: translate(-50%, -10px) scale(1.2); }} 80% {{ opacity: 1; transform: translate(-50%, -20px) scale(1); }} 100% {{ opacity: 0; transform: translate(-50%, -50px) scale(1); }} }}</style>"
+
 is_boss = (st.session_state.question_count % 10 == 0)
 
 if is_boss:
@@ -343,14 +354,15 @@ else:
 # --- 💥 敵を討ち取った時のエフェクト生成 ---
 battle_effect = ""
 if st.session_state.get("just_correct", False):
-    # 💡 アニメーション名（floatUp_〇〇）に問題番号を混ぜて、毎回「新しいアニメーション」だとブラウザに錯覚させる！
     c = st.session_state.question_count
     battle_effect = f"<div style='position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffea00; font-size: 1.5rem; font-weight: bold; white-space: nowrap; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; z-index: 10; animation: floatUp_{c} 1.5s ease-out forwards;'>💥 討ち取ったり！</div><style>@keyframes floatUp_{c} {{ 0% {{ opacity: 0; transform: translate(-50%, 20px) scale(0.5); }} 15% {{ opacity: 1; transform: translate(-50%, -10px) scale(1.2); }} 80% {{ opacity: 1; transform: translate(-50%, -20px) scale(1); }} 100% {{ opacity: 0; transform: translate(-50%, -50px) scale(1); }} }}</style>"
     st.session_state.just_correct = False
-# 💡 コードブロック化のバグを防ぐため、HTMLの字下げ（インデント）を左端に詰めています
+
+# 💡 左側の自分エリアにも position: relative と {level_effect} を組み込みました
 html_ui = f"""
 <div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
-<div style="text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
+<div style="position: relative; text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
+{level_effect}
 <div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
 <div style="font-size: 2.5rem;">{character}</div>
 <div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
