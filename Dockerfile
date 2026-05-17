@@ -11,8 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 4. 作成したアプリのファイルをすべてサーバーにコピー
 COPY . .
 
-# 5. Cloud Runが使うポート（8080）を開放
-EXPOSE 8080
+# 5. Cloud Runが使うポート（8501）を開放
+EXPOSE 8501
 
 # 6. アプリを起動する呪文（Home.pyを指定し、ポートを8080に設定）
-CMD ["streamlit", "run", "Home.py", "--server.port=8080", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
