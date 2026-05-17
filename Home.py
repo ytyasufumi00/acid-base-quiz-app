@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st　
 
 # 表紙のページ設定
 st.set_page_config(page_title="信州上田 医療ツールポータル", page_icon="🏥")
