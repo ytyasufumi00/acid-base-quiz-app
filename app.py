@@ -267,28 +267,28 @@ if st.session_state.is_game_over:
     failed_case = st.session_state.current_case
     st.error("💀 **無念、討死...！！**")
     
-    # 💡 討死した問題のデータ（文字色を白や薄ピンクに強制固定）
+    # 💡 <p>タグをすべて<div>タグに変更して、スマホ用CSSの呪縛を完全に回避！
     st.markdown(f"""
         <div style="background-color: #4d0000; padding: 15px; border-radius: 10px; border: 1px solid #ff4b4b; margin-bottom: 20px; color: white;">
-            <p style="margin: 0; color: #ffdddd !important; font-size: 0.9rem; font-weight: bold;">【討死した問題のデータ】</p>
-            <p style="font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: #ffffff !important;">
+            <div style="margin: 0; color: #ffdddd; font-size: 0.9rem; font-weight: bold;">【討死した問題のデータ】</div>
+            <div style="font-size: 1.2rem; font-weight: bold; margin: 5px 0; color: #ffffff;">
                 pH: {failed_case['pH']} | PaCO2: {failed_case['PaCO2']} mmHg | HCO3-: {failed_case['HCO3']} mEq/L
-            </p>
+            </div>
             <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #662222;">
-                <span style="font-size: 1rem; color: #ffffff !important;">正答：</span>
-                <span style="font-size: 1.3rem; font-weight: bold; color: #00ff00 !important;">{failed_case['answer']}</span>
+                <span style="font-size: 1rem; color: #ffffff;">正答：</span>
+                <span style="font-size: 1.3rem; font-weight: bold; color: #00ff00;">{failed_case['answer']}</span>
             </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # 💡 戦績報告カード（文字、スコア、ランキング文を明るい白・金・赤に強制固定）
+    # 💡 こちらの戦績報告も<p>タグを<div>タグに変更！
     st.markdown(f"""
     <div style='text-align: center; border: 3px solid #ff4b4b; padding: 20px; border-radius: 10px; background-color: #330000; color: white;'>
-        <h2 style='color: #ff4b4b !important; font-family: "Shippori Mincho", serif;'>⚔️ 戦績報告 ⚔️</h2>
-        <p style='font-size: 20px; color: #ffffff !important;'><b>{st.session_state.player_name}</b> 殿</p>
-        <h1 style='color: #ffea00 !important; font-family: "Shippori Mincho", serif;'>最終スコア： {st.session_state.last_score}</h1>
-        <h2 style='color: gold !important; font-family: "Shippori Mincho", serif;'>最終階級：【 {st.session_state.last_rank} 】</h2>
-        <p style='font-size: 16px; color: #ffbcbc !important; font-weight: bold;'>ランキングに記録されました！次の出陣をお待ちしております。</p>
+        <h2 style='color: #ff4b4b; font-family: "Shippori Mincho", serif;'>⚔️ 戦績報告 ⚔️</h2>
+        <div style='font-size: 20px; color: #ffffff; margin-bottom: 15px;'><b>{st.session_state.player_name}</b> 殿</div>
+        <h1 style='color: #ffea00; font-family: "Shippori Mincho", serif;'>最終スコア： {st.session_state.last_score}</h1>
+        <h2 style='color: gold; font-family: "Shippori Mincho", serif;'>最終階級：【 {st.session_state.last_rank} 】</h2>
+        <div style='font-size: 16px; color: #ffbcbc; font-weight: bold; margin-top: 15px;'>ランキングに記録されました！次の出陣をお待ちしております。</div>
     </div>
     """, unsafe_allow_html=True)
     
