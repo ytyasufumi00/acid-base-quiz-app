@@ -366,7 +366,7 @@ html_ui = f"""
 <div style="font-family: 'Shippori Mincho', serif; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: {bg_color}; border-radius: 10px; margin-bottom: 20px; color: white; border: {'2px solid #ff4b4b' if is_boss else '1px solid #444'}; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
 <div style="position: relative; text-align: center; flex: 2; border-right: 2px solid #444; padding-right: 10px;">
 {level_effect}
-<div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
+<div style="font-size: 1.2rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
 <div style="font-size: 2.5rem;">{character}</div>
 <div style="font-size: 1.8rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
 </div>
