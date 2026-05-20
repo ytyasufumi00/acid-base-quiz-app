@@ -368,7 +368,7 @@ html_ui = f"""
 {level_effect}
 <div style="font-size: 0.8rem; color: #aaa;">Lv.{current_lv} {current_rank}</div>
 <div style="font-size: 2.5rem;">{character}</div>
-<div style="font-size: 1.2rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
+<div style="font-size: 1.8rem; font-weight: bold; color: #fff;">{st.session_state.player_name} <span style="font-size:0.8rem; color:#aaa;">殿</span></div>
 </div>
 <div style="text-align: center; flex: 1; padding: 0 10px;">
 <div style="font-size: 1.8rem; font-weight: bold; color: #ff4b4b; text-shadow: 0 0 8px #ff0000;">VS</div>
